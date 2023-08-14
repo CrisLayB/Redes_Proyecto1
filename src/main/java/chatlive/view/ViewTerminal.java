@@ -1,4 +1,4 @@
-package view;
+package chatlive.view;
 
 import java.util.Scanner;
 import java.io.Console;
@@ -28,7 +28,7 @@ public class ViewTerminal {
     }
     
     public String[] login(){
-        String username = getText("\nUser (user@example.org): ");
+        String username = getText("\nOnly write the username: ");
         String password = getPassword();
         return new String[]{username, password};
     }
@@ -42,6 +42,7 @@ public class ViewTerminal {
     }
     
     public String menuChat(String username){
+        // clean();
         line();
         System.out.println("WELCOME TO THE CHAT XMPP APP - " + username);
         System.out.println("1. Shot all the users/contacts and their state");

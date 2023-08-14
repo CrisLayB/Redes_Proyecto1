@@ -1,7 +1,7 @@
-package controller;
+package chatlive.controller;
 
-import view.ViewTerminal;
-import model.XmppClient;
+import chatlive.view.ViewTerminal;
+import chatlive.model.XmppClient;
 
 public class Controller {
     private ViewTerminal view;
@@ -25,7 +25,6 @@ public class Controller {
                 case "1":
                     String[] loginCredentials = view.login();
 
-                    // Check if is user valid or not
                     client = new XmppClient(loginCredentials[0], loginCredentials[1]);
 
                     try {
@@ -35,20 +34,15 @@ public class Controller {
                         view.errorConnect(e.getMessage());
                         continue;
                     }
-
-                    if(client == null){
-                        view.errorClientNull();
-                        continue;
-                    }
                     
                     endApp = chatMenu(loginCredentials[0]);
                     break;
     
                 case "2":
-                    String[] createuserCredentials = view.createNewUser();
-                    // Create the new user
-                    // !...
-                    endApp = chatMenu(createuserCredentials[0]);
+                    // String[] createuserCredentials = view.createNewUser();
+                    // // Create the new user
+                    
+                    // endApp = chatMenu(createuserCredentials[0]);
                     break;
     
                 case "3":
@@ -71,7 +65,7 @@ public class Controller {
 
             switch (selection) {
                 case "1":
-                    showAllusers();
+                    client.displayContactsList();
                     break;
 
                 case "2":
@@ -124,10 +118,6 @@ public class Controller {
         } while (!endMenuChat);
 
         return endAppToo;
-    }
-
-    private void showAllusers(){
-
     }
 
     private void addUserToContacts(){

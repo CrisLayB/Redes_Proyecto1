@@ -6,7 +6,9 @@ import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
+import org.jivesoftware.smackx.iqregister.AccountManager;
 import org.jxmpp.jid.BareJid;
+import org.jxmpp.jid.parts.Localpart;
 import org.jxmpp.stringprep.XmppStringprepException;
 import org.jivesoftware.smack.ConnectionConfiguration.SecurityMode;
 import org.jivesoftware.smack.chat2.ChatManager;
@@ -19,10 +21,9 @@ public class XmppClient {
     private AbstractXMPPConnection connection;
     private static final String XMPP_SERER_AND_DOMAIN = "alumchat.xyz";
 
-    public XmppClient(String username, String password){
+    public XmppClient(){
         try {
             XMPPTCPConnectionConfiguration config = XMPPTCPConnectionConfiguration.builder()
-                .setUsernameAndPassword(username, password)
                 .setXmppDomain(XMPP_SERER_AND_DOMAIN)
                 .setHost(XMPP_SERER_AND_DOMAIN)
                 .setPort(5222)
@@ -35,14 +36,21 @@ public class XmppClient {
             System.err.println("Error al conectarse al servidor XMPP: " + xmppStringExc.getMessage());
         }
         catch (Exception e) {
-            System.out.println("\n==> ERROR HAPPEND HERE \n");
+            System.err.println("\n==> ERROR HAPPEND HERE \n");
             e.printStackTrace();
         }
     }
 
-    public void connect() throws Exception{
+    public void login(String username, String password) throws Exception{
         connection.connect();
-        connection.login();
+        connection.login(username, password);
+    }
+
+    public void createUser(String username, String password) throws Exception {
+        AccountManager accountManager = AccountManager.getInstance(connection);
+        accountManager.sensitiveOperationOverInsecureConnection(true);
+        accountManager.createAccount(Localpart.from(username), password);
+        // login(username, password);
     }
 
     public void disconnect(){
@@ -60,7 +68,7 @@ public class XmppClient {
         Roster roster = Roster.getInstanceFor(connection);
 		Collection<RosterEntry> entries = roster.getEntries();
 
-		System.out.println("\n\n" + entries.size() + " contacts:");
+		System.out.println("\n\n" + entries.size() + " contacts");
 		for (RosterEntry r : entries) {
             BareJid user = r.getJid();
             Type presenceType = roster.getPresence(user).getType();

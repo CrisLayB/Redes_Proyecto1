@@ -36,9 +36,8 @@ public class ViewTerminal {
     public String[] createNewUser(){
         String username = getText("\nUsername: ");
         String fullname = getText("\nFull Name: ");
-        String email = getText("\nEmail: ");
         String password = getPassword();
-        return new String[]{username, fullname, email, password};
+        return new String[]{username, fullname, password};
     }
     
     public String menuChat(String username){

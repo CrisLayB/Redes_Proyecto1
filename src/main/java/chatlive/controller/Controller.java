@@ -9,7 +9,7 @@ public class Controller {
 
     public Controller(){
         view = new ViewTerminal();
-        client = null;
+        client = new XmppClient();
     }
 
     public void app(){
@@ -25,10 +25,8 @@ public class Controller {
                 case "1":
                     String[] loginCredentials = view.login();
 
-                    client = new XmppClient(loginCredentials[0], loginCredentials[1]);
-
                     try {
-                        client.connect();                        
+                        client.login(loginCredentials[0], loginCredentials[1]);
                     } catch (Exception e) {
                         e.printStackTrace();
                         view.errorConnect(e.getMessage());
@@ -36,13 +34,22 @@ public class Controller {
                     }
                     
                     endApp = chatMenu(loginCredentials[0]);
+                    client.disconnect();
                     break;
     
                 case "2":
-                    // String[] createuserCredentials = view.createNewUser();
-                    // // Create the new user
+                    String[] createuserCredentials = view.createNewUser();
                     
-                    // endApp = chatMenu(createuserCredentials[0]);
+                    try {
+                        client.createUser(createuserCredentials[0], createuserCredentials[2]);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        view.errorConnect(e.getMessage());                        
+                        continue;
+                    }
+                    
+                    endApp = chatMenu(createuserCredentials[0]);
+                    client.disconnect();
                     break;
     
                 case "3":
@@ -102,13 +109,11 @@ public class Controller {
 
                 case "10":
                     endMenuChat = true;
-                    client.disconnect();
                     break;
 
                 case "11":
                     endMenuChat = true;
                     endAppToo = true;
-                    client.disconnect();
                     break;
             
                 default:

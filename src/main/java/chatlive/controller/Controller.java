@@ -1,7 +1,9 @@
 package chatlive.controller;
 
+import org.jivesoftware.smack.SmackException;
+
+import chatlive.models.XmppClient;
 import chatlive.view.ViewTerminal;
-import chatlive.model.XmppClient;
 
 public class Controller {
     private ViewTerminal view;
@@ -33,7 +35,8 @@ public class Controller {
                         continue;
                     }
                     
-                    endApp = chatMenu(loginCredentials[0]);
+                    view.loggedSuccessfully();
+                    endApp = chatMenu();
                     client.disconnect();
                     break;
     
@@ -48,7 +51,7 @@ public class Controller {
                         continue;
                     }
                     
-                    endApp = chatMenu(createuserCredentials[0]);
+                    endApp = chatMenu();
                     client.disconnect();
                     break;
     
@@ -63,16 +66,15 @@ public class Controller {
         } while (!endApp);
     }
 
-    private boolean chatMenu(String username){
-        // ? Send presence
+    private boolean chatMenu(){
         boolean endAppToo = false;
         boolean endMenuChat = false;
         do {
-            String selection = view.menuChat(username);
+            String selection = view.menuChat(client.getInformationUser());
 
             switch (selection) {
                 case "1":
-                    client.displayContactsList();
+                    view.displayContactsList(client.displayContactsList());
                     break;
 
                 case "2":
@@ -91,7 +93,7 @@ public class Controller {
                     grupalConversations();
                     break;
 
-                case "6":
+                case "6":                    
                     definePresenceMessage();
                     break;
 
@@ -142,7 +144,18 @@ public class Controller {
     }
 
     private void definePresenceMessage(){
-
+        try {
+            client.setPressenceMessage(
+                view.getText("Write your status Message: ")
+            );
+            view.statusChanguedSuccessfully();
+        } 
+        catch (SmackException.NotConnectedException | InterruptedException e) {
+            e.printStackTrace();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void seeNotifications(){

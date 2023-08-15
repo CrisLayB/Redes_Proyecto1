@@ -1,6 +1,10 @@
 package chatlive.view;
 
+import java.util.ArrayList;
 import java.util.Scanner;
+
+import chatlive.models.Colors;
+
 import java.io.Console;
 
 public class ViewTerminal {
@@ -40,10 +44,12 @@ public class ViewTerminal {
         return new String[]{username, fullname, password};
     }
     
-    public String menuChat(String username){
+    public String menuChat(String[] details){
         // clean();
         line();
-        System.out.println("WELCOME TO THE CHAT XMPP APP - " + username);
+        System.out.println("WELCOME TO THE CHAT XMPP APP - " + details[0]);
+        System.out.println("Presence: " + Colors.CYAN + details[1] + Colors.RESET);
+        System.out.println("Status: " + Colors.GREEN + details[2] + Colors.RESET);
         System.out.println("1. Shot all the users/contacts and their state");
         System.out.println("2. Add a user in the contacts");
         System.out.println("3. Show details of conact of an user");
@@ -74,7 +80,32 @@ public class ViewTerminal {
         System.out.println("\nError: The client is null");
     }
 
-    private String getText(String message){
+    public void displayContactsList(ArrayList<String[]> list){
+        System.out.println("\nAmount Contacts: " + list.get(0)[0]);
+
+        if(list.size() <= 1) return;
+
+        for (int i = 1; i < list.size(); i++) {
+            String[] data = list.get(i);
+            System.out.println("\n=> " + data[0]);
+            System.out.println("Presence: " + Colors.CYAN + data[1] + Colors.RESET);
+            System.out.println("Status: " + Colors.GREEN + data[2] + Colors.RESET);
+        }
+    }
+
+    public void loggedSuccessfully(){
+        System.out.println("\nLogged Successfully");
+        wait(3000);
+        clean();
+    }
+
+    public void statusChanguedSuccessfully(){
+        System.out.println("\nStatus Changued Successfully");
+        wait(1000);
+        clean();
+    }
+
+    public String getText(String message){
         String text = "";
 
         while(text.isBlank()){
@@ -106,7 +137,7 @@ public class ViewTerminal {
     }
 
     private void line(){
-        System.out.println("============================================");
+        System.out.println("=============================================================");
     }    
 
     private static void wait(int ms) {

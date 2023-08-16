@@ -35,7 +35,7 @@ public class Controller {
                         continue;
                     }
                     
-                    view.loggedSuccessfully();
+                    view.messageSuccessfully("Logged Successfully", 1000);
                     endApp = chatMenu();
                     client.disconnect();
                     break;
@@ -86,11 +86,11 @@ public class Controller {
                     break;
 
                 case "4":
-                    communication1To1();
+                    // communication1To1();
                     break;
 
                 case "5":
-                    grupalConversations();
+                    // grupalConversations();
                     break;
 
                 case "6":                    
@@ -98,15 +98,15 @@ public class Controller {
                     break;
 
                 case "7":
-                    seeNotifications();
+                    // seeNotifications();
                     break;
 
                 case "8":
-                    seeFiles();
+                    // seeFiles();
                     break;
 
                 case "9":
-                    deleteUser();
+                    // deleteUser();
                     break;
 
                 case "10":
@@ -128,11 +128,23 @@ public class Controller {
     }
 
     private void addUserToContacts(){
-
+        try {
+            client.addContactToList(view.getText("\nWrite the user that you want to add: "));
+            view.messageSuccessfully("User Added Successfully", 1000);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void showDetailsOfUser(){
-
+        try {
+            view.displayContactDetail(
+                client.getContactDetail(view.getText("\nWrite the username: "))
+            );            
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void communication1To1(){
@@ -148,7 +160,7 @@ public class Controller {
             client.setPressenceMessage(
                 view.getText("Write your status Message: ")
             );
-            view.statusChanguedSuccessfully();
+            view.messageSuccessfully("Status Changued Successfully", 1000);
         } 
         catch (SmackException.NotConnectedException | InterruptedException e) {
             e.printStackTrace();

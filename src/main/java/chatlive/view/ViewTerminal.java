@@ -111,6 +111,21 @@ public class ViewTerminal {
         clean();
     }
 
+    public String messageInput(String prompt){
+        System.out.println(prompt + ": ");
+        return scanner.nextLine();
+    }
+
+    public void displayMessage(String from, String content){
+        System.out.println("Message from " + from + ": " + content);
+    }
+
+    public void displayMessages(ArrayList<String> messages){
+        for (String message : messages) {
+            System.out.println(message);
+        }
+    }
+
     public String getText(String message){
         String text = "";
 
@@ -125,18 +140,19 @@ public class ViewTerminal {
         return text;
     }
 
+    public void errorUserNotFound(){
+        System.out.println(Colors.RED + "\nUser not found" + Colors.RESET);
+    }
+
     private String getPassword(){
         String password = "";
 
-        while(password.isBlank() || password.length() < 4){
+        while(password.isBlank()){
             char[] passwordArray = console.readPassword("Enter your password: ");
             password = new String(passwordArray);
 
             if(password.isBlank())
                 System.out.println("\nThe input is empty, please write something right\n");
-
-            if(password.length() < 4)
-                System.out.println("\nThe password has less of 4 characters, please add more\n");
         }
         
         return password;

@@ -86,11 +86,11 @@ public class Controller {
                     break;
 
                 case "4":
-                    // communication1To1();
+                    communication1To1();
                     break;
 
                 case "5":
-                    // grupalConversations();
+                    grupalConversations();
                     break;
 
                 case "6":                    
@@ -148,11 +148,63 @@ public class Controller {
     }
 
     private void communication1To1(){
+        try {
+            boolean ready = client.createChat(
+                view.getText("Write the username to chat")
+            );
 
+            if(!ready) {
+                view.errorUserNotFound();
+                return;
+            }
+
+            // ! Creo que aquí se pone el listener o talvez dentro del while....
+            
+            boolean quit = false;
+            while(!quit){
+                String message = view.messageInput("Write your message (write 'exit' for finish this chat)");
+
+                if("exit".equalsIgnoreCase(message)){
+                    quit = true;
+                    continue;
+                }
+
+                client.sendMessage(message, false);
+            }
+        } 
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void grupalConversations(){
+        try {
+            client.joinGroupChat(
+                view.getText("Write the conference name"),
+                 view.getText("Please write a nickname")
+            );
+                        
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
 
+        boolean quit = false;
+        while(!quit){
+            String message = view.messageInput("Write your message (write 'exit' for finish this chat)");
+
+            if("exit".equalsIgnoreCase(message)){
+                quit = true;
+                continue;
+            }
+
+            try {
+                client.sendMessage(message, true);
+                view.displayMessages(client.incomingMessagesGroup());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void definePresenceMessage(){

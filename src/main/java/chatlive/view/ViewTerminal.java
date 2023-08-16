@@ -144,6 +144,23 @@ public class ViewTerminal {
         System.out.println(Colors.RED + "\nUser not found" + Colors.RESET);
     }
 
+    public boolean confirmDeleteCount(){
+        System.out.println("Are you sure that you want to delete this count? (s/n) ");
+        String option = scanner.nextLine();
+        return (option.equals("S") || option.equals("s"));
+    }
+
+    public boolean countDeleted(String message){
+        if(!message.equals("1")){
+            System.out.println(message);
+            return false;
+        }
+
+        System.out.println("\nCount Deleted Successfully\n");
+        wait(1000);
+        return true;
+    }
+
     private String getPassword(){
         String password = "";
 

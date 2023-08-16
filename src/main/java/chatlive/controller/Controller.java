@@ -106,7 +106,7 @@ public class Controller {
                     break;
 
                 case "9":
-                    // deleteUser();
+                    endMenuChat = deleteUser();
                     break;
 
                 case "10":
@@ -158,8 +158,6 @@ public class Controller {
                 return;
             }
 
-            // ! Creo que aquí se pone el listener o talvez dentro del while....
-            
             boolean quit = false;
             while(!quit){
                 String message = view.messageInput("Write your message (write 'exit' for finish this chat)");
@@ -230,7 +228,11 @@ public class Controller {
 
     }
 
-    private void deleteUser(){
-
+    private boolean deleteUser(){
+        if(!view.confirmDeleteCount()) return false;
+        
+        String information = client.deleteUser();
+        view.countDeleted(information);
+        return true;
     }
 }

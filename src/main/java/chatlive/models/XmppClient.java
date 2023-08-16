@@ -23,8 +23,10 @@ import org.jivesoftware.smack.ConnectionConfiguration.SecurityMode;
 import org.jivesoftware.smack.SmackException.NoResponseException;
 import org.jivesoftware.smack.XMPPException.XMPPErrorException;
 import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.chat2.Chat;
 import org.jivesoftware.smack.chat2.ChatManager;
+import org.jivesoftware.smack.chat2.IncomingChatMessageListener;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.Presence.Type;
@@ -36,6 +38,7 @@ public class XmppClient {
     private ChatManager chatManager;
     private Chat chatOneToOne;
     private MultiUserChat chatGroup;
+    private AccountManager accountManager;
     private static final String XMPP_SERER_AND_DOMAIN = "alumchat.xyz";
 
     public XmppClient(){
@@ -51,7 +54,13 @@ public class XmppClient {
                 .build();
 
             connection = new XMPPTCPConnection(config);
+
             chatManager = ChatManager.getInstanceFor(connection);
+            chatManager.addIncomingListener(new XmppMessageListener());
+
+            accountManager = AccountManager.getInstance(connection);
+            accountManager.sensitiveOperationOverInsecureConnection(true);
+
             chatOneToOne = null;
             chatGroup = null;
         } catch (XmppStringprepException  xmppStringExc) {
@@ -89,14 +98,33 @@ public class XmppClient {
         connection.login(username, password);
     }
 
-    public void createUser(String username, String password) throws Exception {
-        AccountManager accountManager = AccountManager.getInstance(connection);
-        accountManager.sensitiveOperationOverInsecureConnection(true);
+    public void createUser(String username, String password) throws Exception {        
         accountManager.createAccount(Localpart.from(username), password);
     }
 
+    public String deleteUser() {
+        try {
+            accountManager.deleteAccount();            
+        } catch (SmackException.NoResponseException NoResponse) {
+            return NoResponse.getMessage();
+        }
+        catch (XMPPException.XMPPErrorException XErrorEx) {
+            return XErrorEx.getMessage();
+        }
+        catch (SmackException.NotConnectedException NotConnected) {
+            return NotConnected.getMessage();
+        }
+        catch (InterruptedException ie) {
+            return ie.getMessage();
+        }
+
+        return "1";
+    }
+
     public void disconnect(){
-        if(connection != null) connection.disconnect();
+        if(connection.isConnected()){
+            connection.disconnect();
+        }
     }
 
     public ArrayList<String[]> displayContactsList(){
@@ -141,15 +169,14 @@ public class XmppClient {
             };
     }
 
-    // En la clase XmppModel
     public boolean createChat(String contact) throws XmppStringprepException {
         EntityBareJid jid = JidCreate.entityBareFrom(contact + "@" + XMPP_SERER_AND_DOMAIN);
         Roster roster = Roster.getInstanceFor(connection);
         RosterEntry entry = roster.getEntry(jid);
 
         if(entry == null) return false;
-
-        chatOneToOne = chatManager.chatWith(jid);
+        
+        chatOneToOne = chatManager.chatWith(jid);        
         return true;
     }
 
@@ -190,4 +217,15 @@ public class XmppClient {
         presence.setStatus(statusMessage);
         connection.sendStanza(presence);
     }
+
+    class XmppMessageListener implements IncomingChatMessageListener{
+
+        @Override
+        public void newIncomingMessage(EntityBareJid from, Message message, Chat chat) {
+            String user = from.toString();
+            String body = message.getBody();
+            System.out.println(user + ": " + body); // Broke the MVC because is there not other way :(
+        }
+
+    }    
 }

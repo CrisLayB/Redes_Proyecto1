@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.HashMap;
 
 import org.jivesoftware.smack.AbstractXMPPConnection;
+import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 import org.jivesoftware.smackx.iqregister.AccountManager;
@@ -120,7 +121,6 @@ public class XmppClient {
             return XErrorEx.getMessage();
         }
         catch (SmackException.NotConnectedException NotConnected) {
-            NotConnected.printStackTrace();
             return NotConnected.getMessage();
         }
         catch (InterruptedException ie) {
@@ -221,6 +221,21 @@ public class XmppClient {
         return true;
     }
 
+    public void joinGroupChat(String room, String nickname) throws XmppStringprepException, MultiUserChatException.MucAlreadyJoinedException, SmackException.NotConnectedException, InterruptedException, NotAMucServiceException, XMPPErrorException, NoResponseException  {
+        EntityBareJid jid = JidCreate.entityBareFrom(room + "@conference." + XMPP_SERER_AND_DOMAIN);
+        chatGroup = MultiUserChatManager.getInstanceFor(connection).getMultiUserChat(jid);
+        chatGroup.join(Resourcepart.from(nickname));
+        
+        chatGroup.addMessageListener(new MessageListener() {
+            @Override
+            public void processMessage(Message message) {
+                String from = message.getFrom().getResourceOrEmpty().toString();
+                String body = message.getBody();
+                System.out.println("Message from " + from + ": " + body);
+            }
+        });
+    }
+
     public void sendMessage(String message, boolean forGrupalChat) throws Exception {
         if(forGrupalChat){
             chatGroup.sendMessage(message);
@@ -228,12 +243,6 @@ public class XmppClient {
         }
         
         chatOneToOne.send(message);        
-    }
-
-    public void joinGroupChat(String room, String nickname) throws XmppStringprepException, MultiUserChatException.MucAlreadyJoinedException, SmackException.NotConnectedException, InterruptedException, NotAMucServiceException, XMPPErrorException, NoResponseException  {
-        EntityBareJid jid = JidCreate.entityBareFrom(room + "@conference." + XMPP_SERER_AND_DOMAIN);
-        chatGroup = MultiUserChatManager.getInstanceFor(connection).getMultiUserChat(jid);
-        chatGroup.join(Resourcepart.from(nickname));
     }
 
     public ArrayList<String> incomingMessagesGroup() throws MucNotJoinedException, InterruptedException {
@@ -265,8 +274,8 @@ public class XmppClient {
         public void newIncomingMessage(EntityBareJid from, Message message, Chat chat) {
             String user = from.toString();
             String body = message.getBody();
-            System.out.println(user + ": " + body); // Broke the MVC because is there not other way :(
+            System.out.println("Message recived from " + user + ": " + body); // Broke the MVC because is there not other way :(
         }
 
-    }    
+    }
 }

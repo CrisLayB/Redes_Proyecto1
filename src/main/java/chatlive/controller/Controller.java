@@ -185,7 +185,7 @@ public class Controller {
         try {
             client.joinGroupChat(
                 view.getText("Write the conference name"),
-                 view.getText("Please write a nickname")
+                view.getText("Please write a nickname")
             );
                         
         } catch (Exception e) {
@@ -226,13 +226,13 @@ public class Controller {
         }
     }
 
-    private void seeNotifications(){
+    // private void seeNotifications(){
         
-    }
+    // }
 
-    private void seeFiles(){
+    // private void seeFiles(){
 
-    }
+    // }
 
     private boolean deleteUser(){
         if(!view.confirmDeleteCount()) return false;

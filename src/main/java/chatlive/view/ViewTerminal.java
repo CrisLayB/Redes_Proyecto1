@@ -1,6 +1,7 @@
 package chatlive.view;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 
 import chatlive.models.Colors;
@@ -37,11 +38,12 @@ public class ViewTerminal {
         return new String[]{username, password};
     }
     
-    public String[] createNewUser(){
-        String username = getText("\nUsername: ");
-        String fullname = getText("\nFull Name: ");
-        String password = getPassword();
-        return new String[]{username, fullname, password};
+    public HashMap<String, String> createNewUser(){
+        HashMap<String, String> attributes = new HashMap<String, String>();
+        attributes.put("username", getText("\nUsername: "));
+        attributes.put("name", getText("\nFull name: "));
+        attributes.put("password", getPassword());
+        return attributes;
     }
     
     public String menuChat(String[] details){
@@ -150,13 +152,18 @@ public class ViewTerminal {
         return (option.equals("S") || option.equals("s"));
     }
 
-    public boolean countDeleted(String message){
+    public boolean countConfirmation(String message, String information){
+        if(message.equals("-1")){
+            System.out.println("\nAccount Manager doesn't supports account creation\n");
+            return false;
+        }
+        
         if(!message.equals("1")){
-            System.out.println(message);
+            System.out.println("\nError: " + message);
             return false;
         }
 
-        System.out.println("\nCount Deleted Successfully\n");
+        System.out.println("\nCount " + information + " Successfully\n");
         wait(1000);
         return true;
     }

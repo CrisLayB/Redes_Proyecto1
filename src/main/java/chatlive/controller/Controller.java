@@ -1,5 +1,7 @@
 package chatlive.controller;
 
+import java.util.HashMap;
+
 import org.jivesoftware.smack.SmackException;
 
 import chatlive.models.XmppClient;
@@ -41,13 +43,17 @@ public class Controller {
                     break;
     
                 case "2":
-                    String[] createuserCredentials = view.createNewUser();
-                    
+                    HashMap<String, String> newUser = view.createNewUser();
+                
+                    String result = client.createUser(newUser);
+
+                    if(!view.countConfirmation(result, "created")) continue;
+                  
                     try {
-                        client.createUser(createuserCredentials[0], createuserCredentials[2]);
+                        client.login(newUser.get("username"), newUser.get("password"));
                     } catch (Exception e) {
                         e.printStackTrace();
-                        view.errorConnect(e.getMessage());                        
+                        view.errorConnect(e.getMessage());
                         continue;
                     }
                     
@@ -232,7 +238,7 @@ public class Controller {
         if(!view.confirmDeleteCount()) return false;
         
         String information = client.deleteUser();
-        view.countDeleted(information);
+        view.countConfirmation(information, "deleted");
         return true;
     }
 }

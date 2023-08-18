@@ -1,7 +1,9 @@
 package chatlive.models;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 
 import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
@@ -48,6 +50,7 @@ public class XmppClient {
                 .setHost(XMPP_SERER_AND_DOMAIN)
                 .setPort(5222)
                 .setCompressionEnabled(false)
+                .setSendPresence(true)                
                 // .setDebuggerEnabled(true)
                 .setSecurityMode(SecurityMode.disabled)
                 .setSendPresence(true)
@@ -58,9 +61,8 @@ public class XmppClient {
             chatManager = ChatManager.getInstanceFor(connection);
             chatManager.addIncomingListener(new XmppMessageListener());
 
-            accountManager = AccountManager.getInstance(connection);
-            accountManager.sensitiveOperationOverInsecureConnection(true);
-
+            accountManager = AccountManager.getInstance(connection);            
+            
             chatOneToOne = null;
             chatGroup = null;
         } catch (XmppStringprepException  xmppStringExc) {
@@ -94,18 +96,57 @@ public class XmppClient {
     }
 
     public void login(String username, String password) throws Exception{
-        connection.connect();
+        if(!connection.isConnected()) connection.connect();
         connection.login(username, password);
     }
 
-    public void createUser(String username, String password) throws Exception {        
-        accountManager.createAccount(Localpart.from(username), password);
+    public String createUser(HashMap<String, String> attributes) {
+        try {
+            if(!connection.isConnected()) connection.connect();
+            
+            if(!accountManager.supportsAccountCreation()) return "-1";
+
+            accountManager.sensitiveOperationOverInsecureConnection(true);
+            accountManager.createAccount(
+                Localpart.from(attributes.get("username")), 
+                attributes.get("password"), 
+                attributes
+            );            
+        } 
+        catch (SmackException.NoResponseException NoResponse) {
+            return NoResponse.getMessage();
+        }
+        catch (XMPPException.XMPPErrorException XErrorEx) {
+            return XErrorEx.getMessage();
+        }
+        catch (SmackException.NotConnectedException NotConnected) {
+            NotConnected.printStackTrace();
+            return NotConnected.getMessage();
+        }
+        catch (InterruptedException ie) {
+            return ie.getMessage();
+        }
+        catch(XmppStringprepException xStrEx){
+            return xStrEx.getMessage();
+        }
+        catch(IOException ioExp){
+            return ioExp.getMessage();
+        }
+        catch(SmackException smackException){
+            return smackException.getMessage();
+        }
+        catch(XMPPException xmppException){
+            return xmppException.getMessage();
+        }
+
+        return "1";
     }
 
     public String deleteUser() {
         try {
             accountManager.deleteAccount();            
-        } catch (SmackException.NoResponseException NoResponse) {
+        } 
+        catch (SmackException.NoResponseException NoResponse) {
             return NoResponse.getMessage();
         }
         catch (XMPPException.XMPPErrorException XErrorEx) {
@@ -198,15 +239,15 @@ public class XmppClient {
     public ArrayList<String> incomingMessagesGroup() throws MucNotJoinedException, InterruptedException {
         ArrayList<String> messages = new ArrayList<String>();
 
-        Message incomingMessage = chatGroup.nextMessage();
-        while (incomingMessage != null) {
-            incomingMessage = chatGroup.nextMessage();
-            
-            if(incomingMessage != null)
-                messages.add(
-                    "Message from " + incomingMessage.getFrom() + 
-                    ": " + Colors.CYAN + incomingMessage.getBody() + Colors.RESET
-                );
+        while (true) {
+            Message incomingMessage = chatGroup.nextMessage();
+
+            if(incomingMessage == null) break;
+                        
+            messages.add(
+                "Message from " + incomingMessage.getFrom() + 
+                ": " + Colors.CYAN + incomingMessage.getBody() + Colors.RESET
+            );
         }
         
         return messages;

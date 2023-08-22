@@ -3,6 +3,7 @@ package chatlive.controller;
 import java.util.HashMap;
 
 import org.jivesoftware.smack.SmackException;
+import org.jxmpp.stringprep.XmppStringprepException;
 
 import chatlive.models.XmppClient;
 import chatlive.view.ViewTerminal;
@@ -166,10 +167,17 @@ public class Controller {
 
             boolean quit = false;
             while(!quit){
-                String message = view.messageInput("Write your message (write 'exit' for finish this chat)");
+                String message = view.messageInput(
+            "Write your message (write 'exit' for finish this chat) (write 'send-file' for send a file)"
+                );
 
                 if("exit".equalsIgnoreCase(message)){
                     quit = true;
+                    continue;
+                }
+
+                if("send-file".equalsIgnoreCase(message)){
+                    sendFile();
                     continue;
                 }
 
@@ -195,10 +203,17 @@ public class Controller {
 
         boolean quit = false;
         while(!quit){
-            String message = view.messageInput("Write your message (write 'exit' for finish this chat)");
+            String message = view.messageInput(
+                "Write your message (write 'exit' for finish this chat) (write 'send-file' for send a file)"
+            );
 
             if("exit".equalsIgnoreCase(message)){
                 quit = true;
+                continue;
+            }
+
+            if("send-file".equalsIgnoreCase(message)){
+                sendFile();
                 continue;
             }
 
@@ -222,6 +237,26 @@ public class Controller {
             e.printStackTrace();
         }
         catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void sendFile(){
+        try {
+            client.sendFile(
+                view.getText("Please write your file path"), 
+                view.getText("Please insert description")
+            );
+            view.fileSendSuccessfully();
+        }
+        catch(SmackException smackException){
+            view.errorOfSmackSendFile(smackException.getMessage());
+        }
+        catch(XmppStringprepException xmppStringprepException){
+            view.errorStringPrepException(xmppStringprepException.getMessage());
+        }
+        catch (Exception e) {
+            view.unknownError(e.getMessage());
             e.printStackTrace();
         }
     }

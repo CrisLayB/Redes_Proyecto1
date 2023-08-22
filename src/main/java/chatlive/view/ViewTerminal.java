@@ -47,12 +47,11 @@ public class ViewTerminal {
     }
     
     public String menuChat(String[] details){
-        // clean();
         line();
         System.out.println("WELCOME TO THE CHAT XMPP APP - " + details[0]);
         System.out.println("Presence: " + Colors.CYAN + details[1] + Colors.RESET);
         System.out.println("Status: " + Colors.GREEN + details[2] + Colors.RESET);
-        System.out.println("1. Shot all the users/contacts and their state");
+        System.out.println("1. Show all the users/contacts and their state");
         System.out.println("2. Add a user in the contacts");
         System.out.println("3. Show details of conact of an user");
         System.out.println("4. Comunication 1 to 1 with any user/contact");
@@ -60,9 +59,9 @@ public class ViewTerminal {
         System.out.println("6. Define presence message");
         System.out.println("7. Display notifications");
         System.out.println("8. Send/Receive files");
-        System.out.println("9. Delete User");
+        System.out.println("9. Delete THIS User");
         System.out.println("10. Close Session");
-        System.out.println("11. Quit App and Close Seccion\n");
+        System.out.println("11. Quit App and Close Session\n");
 
         return scanner.nextLine();
     }
@@ -166,6 +165,22 @@ public class ViewTerminal {
         System.out.println("\nCount " + information + " Successfully\n");
         wait(1000);
         return true;
+    }
+
+    public void errorOfSmackSendFile(String details){
+        System.out.println(Colors.RED + "\nError sending the file: " + details + Colors.RESET);
+    }
+
+    public void errorStringPrepException(String details){
+        System.out.println(Colors.RED + "\nError with the string: " + details + Colors.RESET);
+    }
+
+    public void unknownError(String details){
+        System.out.println(Colors.RED + "\nUnknow Error: " + details + Colors.RESET);
+    }
+
+    public void fileSendSuccessfully(){
+        System.out.println(Colors.GREEN + "\nFile Send Successfully" + Colors.RESET);
     }
 
     private String getPassword(){

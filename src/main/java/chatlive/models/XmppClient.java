@@ -1,12 +1,18 @@
 package chatlive.models;
 
+import chatlive.listeners.XmppMessageListener;
+import chatlive.listeners.XmppRosterListener;
+import chatlive.listeners.XmppSubscribeListener;
+import chatlive.listeners.XmppConnectionListener;
+import chatlive.listeners.XmppEventPresenceEventListener;
+import chatlive.listeners.XmppGroupChatListener;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
 import org.jivesoftware.smack.AbstractXMPPConnection;
-import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 import org.jivesoftware.smackx.iqregister.AccountManager;
@@ -29,7 +35,6 @@ import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.chat2.Chat;
 import org.jivesoftware.smack.chat2.ChatManager;
-import org.jivesoftware.smack.chat2.IncomingChatMessageListener;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.Presence.Type;
@@ -42,6 +47,7 @@ public class XmppClient {
     private Chat chatOneToOne;
     private MultiUserChat chatGroup;
     private AccountManager accountManager;
+    private Roster roster;
     private static final String XMPP_SERER_AND_DOMAIN = "alumchat.xyz";
 
     public XmppClient(){
@@ -58,17 +64,23 @@ public class XmppClient {
                 .build();
 
             connection = new XMPPTCPConnection(config);
+            connection.addConnectionListener(new XmppConnectionListener());
 
             chatManager = ChatManager.getInstanceFor(connection);
             chatManager.addIncomingListener(new XmppMessageListener());
 
-            accountManager = AccountManager.getInstance(connection);            
+            accountManager = AccountManager.getInstance(connection);
+
+            roster = Roster.getInstanceFor(connection);
+            roster.addPresenceEventListener(new XmppEventPresenceEventListener());
+            roster.addRosterListener(new XmppRosterListener());
+            roster.addSubscribeListener(new XmppSubscribeListener());
             
             chatOneToOne = null;
             chatGroup = null;
         } catch (XmppStringprepException  xmppStringExc) {
             xmppStringExc.printStackTrace();
-            System.err.println("Error al conectarse al servidor XMPP: " + xmppStringExc.getMessage());
+            System.err.println("Error to connect to the server XMPP: " + xmppStringExc.getMessage());
         }
         catch (Exception e) {
             System.err.println("\n==> ERROR HAPPEND HERE \n");
@@ -85,7 +97,6 @@ public class XmppClient {
     }
 
     public String[] getInformationUser(){        
-        Roster roster = Roster.getInstanceFor(connection);
         Presence presence = roster.getPresence(connection.getUser().asBareJid());
         String status = roster.getPresence(connection.getUser().asBareJid()).getStatus();
         
@@ -165,11 +176,12 @@ public class XmppClient {
     public void disconnect(){
         if(connection.isConnected()){
             connection.disconnect();
+            chatOneToOne = null;
+            chatGroup = null;
         }
     }
 
     public ArrayList<String[]> displayContactsList(){
-        Roster roster = Roster.getInstanceFor(connection);
 		Collection<RosterEntry> entries = roster.getEntries();        	
 
         ArrayList<String[]> list = new ArrayList<String[]>();
@@ -191,13 +203,11 @@ public class XmppClient {
     }
 
     public void addContactToList(String contact) throws Exception{
-        Roster roster = Roster.getInstanceFor(connection);
         EntityBareJid jid = JidCreate.entityBareFrom(contact + "@" + XMPP_SERER_AND_DOMAIN);        
         roster.createEntry(jid, null, null);
     }
 
     public String[] getContactDetail(String contact) throws XmppStringprepException,Exception {
-        Roster roster = Roster.getInstanceFor(connection);
         EntityBareJid jid = JidCreate.entityBareFrom(contact + "@" + XMPP_SERER_AND_DOMAIN);
         RosterEntry entry = roster.getEntry(jid);
         
@@ -212,7 +222,6 @@ public class XmppClient {
 
     public boolean createChat(String contact) throws XmppStringprepException {
         EntityBareJid jid = JidCreate.entityBareFrom(contact + "@" + XMPP_SERER_AND_DOMAIN);
-        Roster roster = Roster.getInstanceFor(connection);
         RosterEntry entry = roster.getEntry(jid);
 
         if(entry == null) return false;
@@ -226,14 +235,7 @@ public class XmppClient {
         chatGroup = MultiUserChatManager.getInstanceFor(connection).getMultiUserChat(jid);
         chatGroup.join(Resourcepart.from(nickname));
         
-        chatGroup.addMessageListener(new MessageListener() {
-            @Override
-            public void processMessage(Message message) {
-                String from = message.getFrom().getResourceOrEmpty().toString();
-                String body = message.getBody();
-                System.out.println("Message from " + from + ": " + body);
-            }
-        });
+        chatGroup.addMessageListener(new XmppGroupChatListener());
     }
 
     public void sendMessage(String message, boolean forGrupalChat) throws Exception {
@@ -266,16 +268,5 @@ public class XmppClient {
         Presence presence = new Presence(Presence.Type.available);
         presence.setStatus(statusMessage);
         connection.sendStanza(presence);
-    }
-
-    class XmppMessageListener implements IncomingChatMessageListener{
-
-        @Override
-        public void newIncomingMessage(EntityBareJid from, Message message, Chat chat) {
-            String user = from.toString();
-            String body = message.getBody();
-            System.out.println("Message recived from " + user + ": " + body); // Broke the MVC because is there not other way :(
-        }
-
     }
 }

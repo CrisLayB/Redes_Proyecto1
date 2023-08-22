@@ -226,14 +226,6 @@ public class Controller {
         }
     }
 
-    // private void seeNotifications(){
-        
-    // }
-
-    // private void seeFiles(){
-
-    // }
-
     private boolean deleteUser(){
         if(!view.confirmDeleteCount()) return false;
         

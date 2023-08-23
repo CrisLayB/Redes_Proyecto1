@@ -325,7 +325,7 @@ public class ViewTerminal {
         }
     }
 
-    private void clean(){
+    public void clean(){
         System.out.print("\033[H\033[2J");  
         System.out.flush();  
     }

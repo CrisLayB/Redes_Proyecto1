@@ -140,6 +140,10 @@ public class Controller {
                     endMenuChat = true;
                     endAppToo = true;
                     break;
+
+                case "clean":
+                    view.clean();
+                    break;
             
                 default:
                     view.invalidOption();

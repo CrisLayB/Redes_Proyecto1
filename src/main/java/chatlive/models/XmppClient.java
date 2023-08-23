@@ -9,8 +9,10 @@ import chatlive.listeners.XmppFileTransferListener;
 import chatlive.listeners.XmppGroupChatListener;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.HashMap;
 
@@ -18,8 +20,6 @@ import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 import org.jivesoftware.smackx.filetransfer.FileTransferManager;
-import org.jivesoftware.smackx.filetransfer.FileTransferNegotiator;
-import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
 import org.jivesoftware.smackx.iqregister.AccountManager;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.muc.MultiUserChatException;
@@ -64,7 +64,8 @@ public class XmppClient {
     private AccountManager accountManager;
     private Roster roster;
     private FileTransferManager fileTransferManager;
-    private EntityFullJid toSend;
+    private EntityBareJid entityUserJid;
+    private boolean listenerChatGroupCreated;
     private static final String XMPP_SERER_AND_DOMAIN = "alumchat.xyz";
 
     public XmppClient(){
@@ -98,7 +99,8 @@ public class XmppClient {
             
             chatOneToOne = null;
             chatGroup = null;
-            toSend = null;
+
+            listenerChatGroupCreated = false;
         } catch (XmppStringprepException  xmppStringExc) {
             xmppStringExc.printStackTrace();
             System.err.println("Error to connect to the server XMPP: " + xmppStringExc.getMessage());
@@ -303,10 +305,10 @@ public class XmppClient {
      */
     public boolean createChat(String contact) throws XmppStringprepException {
         EntityBareJid jid = JidCreate.entityBareFrom(contact + "@" + XMPP_SERER_AND_DOMAIN);
-        // toSend = JidCreate.entityFullFrom(contact + "@" + XMPP_SERER_AND_DOMAIN);
         RosterEntry entry = roster.getEntry(jid);
 
         if(entry == null) return false;
+        entityUserJid = jid;
         
         chatOneToOne = chatManager.chatWith(jid);
         return true;
@@ -327,11 +329,15 @@ public class XmppClient {
      */
     public void joinGroupChat(String room, String nickname) throws XmppStringprepException, MultiUserChatException.MucAlreadyJoinedException, SmackException.NotConnectedException, InterruptedException, NotAMucServiceException, XMPPErrorException, NoResponseException  {
         EntityBareJid jid = JidCreate.entityBareFrom(room + "@conference." + XMPP_SERER_AND_DOMAIN);
-        // toSend = JidCreate.entityFullFrom(room + "@conference." + XMPP_SERER_AND_DOMAIN);
         chatGroup = MultiUserChatManager.getInstanceFor(connection).getMultiUserChat(jid);
         chatGroup.join(Resourcepart.from(nickname));
-                
-        chatGroup.addMessageListener(new XmppGroupChatListener());
+        
+        entityUserJid = jid;
+
+        if(!listenerChatGroupCreated){
+            chatGroup.addMessageListener(new XmppGroupChatListener());
+            listenerChatGroupCreated = true;
+        }
     }
 
     /**
@@ -395,11 +401,24 @@ public class XmppClient {
      * @throws SmackException
      * @throws XmppStringprepException
      */
-    public void sendFile(String pathFile, String description) throws SmackException, XmppStringprepException {      
-        FileTransferManager transferManager = FileTransferManager.getInstanceFor(connection);
-        OutgoingFileTransfer fileTransfer = transferManager.createOutgoingFileTransfer(toSend);
-        
-        FileTransferNegotiator.IBB_ONLY = true;
-        fileTransfer.sendFile(new File(pathFile), description);
+    public void sendFile(String pathFile, String description) throws SmackException, XmppStringprepException, InterruptedException, IOException {
+        File fileToSend = new File(pathFile);
+
+        String base64File = encodeFileToBase64(fileToSend);
+
+        Message message = new Message(entityUserJid, Message.Type.chat);
+        message.setBody(description);
+        message.setSubject("Base64File");
+        message.addBody("base64", base64File);
+
+        connection.sendStanza(message);
+    }
+
+    private static String encodeFileToBase64(File file) throws IOException {
+        try (FileInputStream inputStream = new FileInputStream(file)) {
+            byte[] fileBytes = new byte[(int) file.length()];
+            inputStream.read(fileBytes);
+            return Base64.getEncoder().encodeToString(fileBytes);
+        }
     }
 }

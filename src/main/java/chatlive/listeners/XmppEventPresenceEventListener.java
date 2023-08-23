@@ -8,13 +8,18 @@ import org.jxmpp.jid.Jid;
 
 import chatlive.models.Colors;
 
+/**
+ * <h1>Networks - UVG</h1>
+ * <h2> Xmpp Event Presence Event Listener </h2>
+ * This listener can handle all the news for the presence.
+ * 
+ * Created By:
+ * @author Cristian Fernando Laynez Bachez - 201281
+ * @since 2023
+ **/
+
 public class XmppEventPresenceEventListener implements PresenceEventListener {
 
-    
-    /** 
-     * @param address
-     * @param availablePresence
-     */
     @Override
     public void presenceAvailable(FullJid address, Presence availablePresence) {
         System.out.println("Contact " + address + " is available.");

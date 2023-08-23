@@ -5,12 +5,18 @@ import org.jivesoftware.smack.XMPPConnection;
 
 import chatlive.models.Colors;
 
+/**
+ * <h1>Networks - UVG</h1>
+ * <h2> Xmpp Connection Listener </h2>
+ * Listener of the status of the connection for the xmpp server.
+ * 
+ * Created By:
+ * @author Cristian Fernando Laynez Bachez - 201281
+ * @since 2023
+ **/
+
 public class XmppConnectionListener implements ConnectionListener {
 
-    
-    /** 
-     * @param connection
-     */
     @Override
     public void connected(XMPPConnection connection) {
         System.out.println("Connected to the XMPP server.");

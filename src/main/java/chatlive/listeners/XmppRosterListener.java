@@ -6,12 +6,18 @@ import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.roster.RosterListener;
 import org.jxmpp.jid.Jid;
 
-public class XmppRosterListener implements RosterListener {
+/**
+ * <h1>Networks - UVG</h1>
+ * <h2> Xmpp Roster Listener </h2>
+ * This listener will upgrade the information of the users of the list contacts.
+ * 
+ * Created By:
+ * @author Cristian Fernando Laynez Bachez - 201281
+ * @since 2023
+ **/
 
+public class XmppRosterListener implements RosterListener {
     
-    /** 
-     * @param addresses
-     */
     @Override
     public void entriesAdded(Collection<Jid> addresses) {
         for (Jid address : addresses) {

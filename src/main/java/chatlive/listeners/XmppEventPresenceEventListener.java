@@ -10,6 +10,11 @@ import chatlive.models.Colors;
 
 public class XmppEventPresenceEventListener implements PresenceEventListener {
 
+    
+    /** 
+     * @param address
+     * @param availablePresence
+     */
     @Override
     public void presenceAvailable(FullJid address, Presence availablePresence) {
         System.out.println("Contact " + address + " is available.");

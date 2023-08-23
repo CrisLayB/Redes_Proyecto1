@@ -8,6 +8,10 @@ import org.jxmpp.jid.Jid;
 
 public class XmppRosterListener implements RosterListener {
 
+    
+    /** 
+     * @param addresses
+     */
     @Override
     public void entriesAdded(Collection<Jid> addresses) {
         for (Jid address : addresses) {

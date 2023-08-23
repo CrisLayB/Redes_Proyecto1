@@ -7,6 +7,12 @@ import org.jxmpp.jid.EntityBareJid;
 
 public class XmppMessageListener implements IncomingChatMessageListener{
 
+    
+    /** 
+     * @param from
+     * @param message
+     * @param chat
+     */
     @Override
     public void newIncomingMessage(EntityBareJid from, Message message, Chat chat) {
         String user = from.toString();

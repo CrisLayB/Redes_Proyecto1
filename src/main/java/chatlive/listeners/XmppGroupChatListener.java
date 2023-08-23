@@ -5,6 +5,10 @@ import org.jivesoftware.smack.packet.Message;
 
 public class XmppGroupChatListener implements MessageListener {
 
+    
+    /** 
+     * @param message
+     */
     @Override
     public void processMessage(Message message) {
         String from = message.getFrom().getResourceOrEmpty().toString();

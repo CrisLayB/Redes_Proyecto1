@@ -5,6 +5,10 @@ import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
 
 public class XmppFileTransferListener implements FileTransferListener {
 
+    
+    /** 
+     * @param request
+     */
     @Override
     public void fileTransferRequest(FileTransferRequest request) {
         System.out.println("Received file transfer request from: " + request.getRequestor());

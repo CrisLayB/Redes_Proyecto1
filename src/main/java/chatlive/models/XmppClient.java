@@ -46,6 +46,16 @@ import org.jivesoftware.smack.packet.Presence.Type;
 import org.jivesoftware.smack.roster.Roster;
 import org.jivesoftware.smack.roster.RosterEntry;
 
+/**
+ * <h1>Networks - UVG</h1>
+ * <h2> Xmpp Client </h2>
+ * This is the model of the program that is really the client to connecto to the server xmpp.
+ * 
+ * Created By:
+ * @author Cristian Fernando Laynez Bachez - 201281
+ * @since 2023
+ **/
+
 public class XmppClient {
     private AbstractXMPPConnection connection;
     private ChatManager chatManager;
@@ -99,14 +109,30 @@ public class XmppClient {
         }
     }
     
+    
+    /** 
+     * To Get the connection status of the user logged.
+     * 
+     * @return boolean
+     */
     public boolean isConnected(){
         return (connection != null) && (connection.isConnected());
     }
 
+    /**
+     * Get the current user.
+     * 
+     * @return EntityFullJid : The User with Gid credentials.
+     */
     public EntityFullJid getUser(){                
         return (isConnected()) ? connection.getUser() : null;
     }
 
+    /**
+     * Get information of the user logged.
+     * 
+     * @return String[] : The information of the user
+     */
     public String[] getInformationUser(){        
         Presence presence = roster.getPresence(connection.getUser().asBareJid());
         String status = roster.getPresence(connection.getUser().asBareJid()).getStatus();
@@ -118,11 +144,24 @@ public class XmppClient {
         };
     }
 
+    /**
+     * For connect and login with the correspondent username and password.
+     * 
+     * @param username
+     * @param password
+     * @throws Exception
+     */
     public void login(String username, String password) throws Exception{
         if(!connection.isConnected()) connection.connect();
         connection.login(username, password);
     }
 
+    /**
+     * Crear usuario con sus atributos correspondientes.
+     * 
+     * @param attributes
+     * @return String : The confirmation.
+     */
     public String createUser(HashMap<String, String> attributes) {
         try {
             if(!connection.isConnected()) connection.connect();
@@ -164,6 +203,11 @@ public class XmppClient {
         return "1";
     }
 
+    /**
+     * For Delete the user.
+     * 
+     * @return : Confirmation of delete
+     */
     public String deleteUser() {
         try {
             accountManager.deleteAccount();            

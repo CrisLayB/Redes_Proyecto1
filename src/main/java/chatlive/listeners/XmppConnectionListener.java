@@ -7,6 +7,10 @@ import chatlive.models.Colors;
 
 public class XmppConnectionListener implements ConnectionListener {
 
+    
+    /** 
+     * @param connection
+     */
     @Override
     public void connected(XMPPConnection connection) {
         System.out.println("Connected to the XMPP server.");

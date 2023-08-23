@@ -8,6 +8,16 @@ import org.jxmpp.stringprep.XmppStringprepException;
 import chatlive.models.XmppClient;
 import chatlive.view.ViewTerminal;
 
+/**
+ * <h1>Networks - UVG</h1>
+ * <h2> Controller </h2>
+ * The Controller of the program that joins the functionallity of View and Model.
+ * 
+ * Created By:
+ * @author Cristian Fernando Laynez Bachez - 201281
+ * @since 2023
+ **/
+
 public class Controller {
     private ViewTerminal view;
     private XmppClient client;
@@ -73,6 +83,12 @@ public class Controller {
         } while (!endApp);
     }
 
+    
+    /** 
+     * This methods start with the menu Chat when the user is logged.
+     * 
+     * @return boolean : If the all the program ends or not yet.
+     */
     private boolean chatMenu(){
         boolean endAppToo = false;
         boolean endMenuChat = false;
@@ -261,6 +277,11 @@ public class Controller {
         }
     }
 
+    /**
+     * This Method confirms if the user was deleted of not.
+     * 
+     * @return boolean : Confirmation of getted delete.
+     */
     private boolean deleteUser(){
         if(!view.confirmDeleteCount()) return false;
         

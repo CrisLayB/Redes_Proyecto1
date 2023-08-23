@@ -236,6 +236,11 @@ public class XmppClient {
         }
     }
 
+    /**
+     * Get all the contacts of the follow user.
+     * 
+     * @return ArrayList<String[]> : All the users of the list
+     */
     public ArrayList<String[]> displayContactsList(){
 		Collection<RosterEntry> entries = roster.getEntries();        	
 
@@ -257,11 +262,25 @@ public class XmppClient {
         return list;
     }
 
+    /**
+     * Add the contacts.
+     * 
+     * @param contact
+     * @throws Exception
+     */
     public void addContactToList(String contact) throws Exception{
         EntityBareJid jid = JidCreate.entityBareFrom(contact + "@" + XMPP_SERER_AND_DOMAIN);        
         roster.createEntry(jid, null, null);
     }
 
+    /**
+     * Get the details of the contacts
+     * 
+     * @param contact
+     * @return
+     * @throws XmppStringprepException
+     * @throws Exception
+     */
     public String[] getContactDetail(String contact) throws XmppStringprepException,Exception {
         EntityBareJid jid = JidCreate.entityBareFrom(contact + "@" + XMPP_SERER_AND_DOMAIN);
         RosterEntry entry = roster.getEntry(jid);
@@ -275,6 +294,13 @@ public class XmppClient {
             };
     }
 
+    /**
+     * Create a new chat with the follow username and domain.
+     * 
+     * @param contact
+     * @return
+     * @throws XmppStringprepException
+     */
     public boolean createChat(String contact) throws XmppStringprepException {
         EntityBareJid jid = JidCreate.entityBareFrom(contact + "@" + XMPP_SERER_AND_DOMAIN);
         // toSend = JidCreate.entityFullFrom(contact + "@" + XMPP_SERER_AND_DOMAIN);
@@ -286,6 +312,19 @@ public class XmppClient {
         return true;
     }
 
+    /**
+     * The user can join to a new group.
+     * 
+     * @param room
+     * @param nickname
+     * @throws XmppStringprepException
+     * @throws MultiUserChatException.MucAlreadyJoinedException
+     * @throws SmackException.NotConnectedException
+     * @throws InterruptedException
+     * @throws NotAMucServiceException
+     * @throws XMPPErrorException
+     * @throws NoResponseException
+     */
     public void joinGroupChat(String room, String nickname) throws XmppStringprepException, MultiUserChatException.MucAlreadyJoinedException, SmackException.NotConnectedException, InterruptedException, NotAMucServiceException, XMPPErrorException, NoResponseException  {
         EntityBareJid jid = JidCreate.entityBareFrom(room + "@conference." + XMPP_SERER_AND_DOMAIN);
         // toSend = JidCreate.entityFullFrom(room + "@conference." + XMPP_SERER_AND_DOMAIN);
@@ -295,6 +334,13 @@ public class XmppClient {
         chatGroup.addMessageListener(new XmppGroupChatListener());
     }
 
+    /**
+     * Send message to an individual chat or a group.
+     * 
+     * @param message
+     * @param forGrupalChat
+     * @throws Exception
+     */
     public void sendMessage(String message, boolean forGrupalChat) throws Exception {
         if(forGrupalChat){
             chatGroup.sendMessage(message);
@@ -304,6 +350,13 @@ public class XmppClient {
         chatOneToOne.send(message);
     }   
 
+    /**
+     * Recibe all the messagues for the group.
+     * 
+     * @return ArrayList<String> : Get all the messages
+     * @throws MucNotJoinedException
+     * @throws InterruptedException
+     */
     public ArrayList<String> incomingMessagesGroup() throws MucNotJoinedException, InterruptedException {
         ArrayList<String> messages = new ArrayList<String>();
 
@@ -321,12 +374,27 @@ public class XmppClient {
         return messages;
     }
     
+    /**
+     * Set the presence message for the user.
+     * 
+     * @param statusMessage
+     * @throws SmackException.NotConnectedException
+     * @throws InterruptedException
+     */
     public void setPressenceMessage(String statusMessage) throws SmackException.NotConnectedException, InterruptedException {        
         Presence presence = new Presence(Presence.Type.available);
         presence.setStatus(statusMessage);
         connection.sendStanza(presence);
     }
 
+    /**
+     * Send the file
+     * 
+     * @param pathFile
+     * @param description
+     * @throws SmackException
+     * @throws XmppStringprepException
+     */
     public void sendFile(String pathFile, String description) throws SmackException, XmppStringprepException {      
         FileTransferManager transferManager = FileTransferManager.getInstanceFor(connection);
         OutgoingFileTransfer fileTransfer = transferManager.createOutgoingFileTransfer(toSend);

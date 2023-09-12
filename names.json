@@ -1,0 +1,9 @@
+{
+    "type": "message",
+    "headers": {
+        "from": "foo",
+        "to": "bar",
+        "hop_count": "3"
+    },
+    "payload": "ola pero no ola de mar sino ola de saludo"
+}

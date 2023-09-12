@@ -5,6 +5,7 @@ import java.util.HashMap;
 import org.jivesoftware.smack.SmackException;
 import org.jxmpp.stringprep.XmppStringprepException;
 
+import chatlive.flooding.Builder;
 import chatlive.models.XmppClient;
 import chatlive.view.ViewTerminal;
 
@@ -121,7 +122,7 @@ public class Controller {
                     break;
 
                 case "7":
-                    // seeNotifications();
+                    implementFlooding();
                     break;
 
                 case "8":
@@ -259,6 +260,11 @@ public class Controller {
         catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void implementFlooding(){
+        Builder floodingBuilder = new Builder(view.getText("Write the messague: "), client);
+        floodingBuilder.build(client.getInformationUser()[0]);
     }
 
     private void sendFile(){

@@ -271,7 +271,7 @@ public class XmppClient {
      * @throws Exception
      */
     public void addContactToList(String contact) throws Exception{
-        EntityBareJid jid = JidCreate.entityBareFrom(contact + "@" + XMPP_SERER_AND_DOMAIN);        
+        EntityBareJid jid = JidCreate.entityBareFrom(contact);
         roster.createEntry(jid, null, null);
     }
 
@@ -304,7 +304,7 @@ public class XmppClient {
      * @throws XmppStringprepException
      */
     public boolean createChat(String contact) throws XmppStringprepException {
-        EntityBareJid jid = JidCreate.entityBareFrom(contact + "@" + XMPP_SERER_AND_DOMAIN);
+        EntityBareJid jid = JidCreate.entityBareFrom(contact);
         RosterEntry entry = roster.getEntry(jid);
 
         if(entry == null) return false;

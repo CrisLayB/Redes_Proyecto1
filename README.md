@@ -76,3 +76,9 @@ PD: Is prefered to use the maven proyect in vs code.
 10. Close Session: Gracefully close the current chat session while remaining logged in.
     
 11. Quit Application: Exit the application and close the current session.
+
+## For Lab 3
+
+Please check out this repo for see the implementation of the flooding algorithm.
+
+https://github.com/CrisLayB/Redes_Lab03.git

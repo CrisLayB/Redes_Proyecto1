@@ -49,6 +49,12 @@
       <artifactId>smack-java7</artifactId>
       <version>4.2.0</version>
     </dependency>
+
+    <dependency>
+      <groupId>com.googlecode.json-simple</groupId>
+      <artifactId>json-simple</artifactId>
+      <version>1.1.1</version>
+    </dependency>
   </dependencies>
 
   <build>

@@ -90,7 +90,7 @@ public class ViewTerminal {
         System.out.println("4. Comunication 1 to 1 with any user/contact");
         System.out.println("5. Participate in grupal conversations");
         System.out.println("6. Define presence message");
-        System.out.println("7. Display notifications");
+        System.out.println("7. Use *FLOODING*");
         System.out.println("8. Send/Receive files");
         System.out.println("9. Delete THIS User");
         System.out.println("10. Close Session");

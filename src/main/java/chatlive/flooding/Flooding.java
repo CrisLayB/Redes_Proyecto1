@@ -30,25 +30,26 @@ public class Flooding {
             mainUser = node.getName();
         }
         else{
-            System.out.println("Node " + node.getLabel() + " - " + node.getName() + " received message: " + message);
-            // ! SEND message to the users
+            System.out.println("Node " + node.getLabel() + " - " + node.getName() + " - Avaliable: " + node.getAvaliable());
+
             try {
-                client.createChat(node.getName());
+                client.createChat(node.getName());                
 
                 String jsonMessage = "{\n" + //
                         "    \"type\": \"message\",\n" + //
                         "    \"headers\": {\n" + //
-                        "        \"from\": \"" + mainUser + "\",\n" + //
-                        "        \"to\": \"" + node.getName() + "\",\n" + //
+                        "        \"from\": \"" + startNode.getLabel() + "\",\n" + //
+                        "        \"to\": \"" + node.getLabel() + "\",\n" + //
                         "        \"hop_count\": \"" + count + "\"\n" + //
                         "    },\n" + //
                         "    \"payload\": \"" + message + "\"\n" + //
                         "}";    
-                
+
                 if(!mainUser.equals(node.getName()))
                 {
                     count++;
-                    client.sendMessage(jsonMessage, false);                
+                    client.sendMessage(jsonMessage, false);              
+                    System.out.println("Messague sended: " + message + "\n");
                 }
             } catch (Exception e) {
                 e.printStackTrace();

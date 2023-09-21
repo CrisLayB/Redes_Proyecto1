@@ -36,88 +36,66 @@ public class Builder {
         }
     }
     
-    public void build(){
-        Map<String, String> readedNodes = readJsonNames("./names1-x-randomX-2023.txt");
-
-        if(readedNodes == null) return;
-        
-        Map<String, Node> nodes = new HashMap<String, Node>();
-
-        String firstNode = "";
-        
-        for(Map.Entry<String, String> node : readedNodes.entrySet()){
-            String key = node.getKey();
-            String value = node.getValue();
-            nodes.put(key, new Node(key, value));
-
-            if(firstNode.equals("")){
-                firstNode = key;
-            }
-        }
-
-        Map<String, ArrayList<String>> readedTopology = readJsonTopology("./topo1-x-randomX-2023.txt");
-
-        if(readedTopology == null) return;
-
-        for(Map.Entry<String, ArrayList<String>> topology : readedTopology.entrySet()){
-            String key = topology.getKey();
-            ArrayList<String> list = topology.getValue();
-
-            for (String item : list) {
-                Edge edge = new Edge(nodes.get(item));
-                nodes.get(key).addNeighbor(edge);
-            }
-        }
-
-        Flooding flooding = new Flooding(nodes.get(firstNode), message, client);
-        flooding.visitedNodes();
-    }
-    
     public void build(String principalName){
         Map<String, String> readedNodes = readJsonNames("./names1-x-randomX-2023.txt");
 
         if(readedNodes == null) return;
 
+        // ! Create nodes and get my own node
         Map<String, Node> nodes = new HashMap<String, Node>();
-        
-        Node first = new Node("FIRST", principalName);
-        String firstNode = "";
+
+        String ownNode = "";
 
         for(Map.Entry<String, String> node : readedNodes.entrySet()){
             String key = node.getKey();
             String value = node.getValue();
-            nodes.put(key, new Node(key, value));
-
+            String status = "unavailable";           
+            
             // ! ADD nodes users in the list of the user
             try {
-                client.addContactToList(value);
+                client.addContactToList(value);     
+                status = client.checkStatus();
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
-            if(firstNode.equals("")){
-                firstNode = key;
+            nodes.put(key, new Node(key, value, status.equals("available")));
+
+            if(principalName.equals(value)){
+                ownNode = key;
             }
         }
 
-        Edge firstWithfirst = new Edge(nodes.get(firstNode));
-        first.addNeighbor(firstWithfirst);
+        // ! Check if own node is defined or not
+        if(ownNode.equals("")){
+            System.out.println("\nOwn node not defined\n");
+            return;
+        }
 
+        // ! Create edges
         Map<String, ArrayList<String>> readedTopology = readJsonTopology("./topo1-x-randomX-2023.txt");
 
         if(readedTopology == null) return;
 
         for(Map.Entry<String, ArrayList<String>> topology : readedTopology.entrySet()){
             String key = topology.getKey();
+            Node tempNode = nodes.get(key);
+
+            if(!tempNode.getAvaliable()) continue;
+
             ArrayList<String> list = topology.getValue();
 
             for (String item : list) {
-                Edge edge = new Edge(nodes.get(item));
-                nodes.get(key).addNeighbor(edge);
+                Node itemNode = nodes.get(item);
+
+                if(itemNode.getAvaliable()){
+                    Edge edge = new Edge(itemNode);
+                    nodes.get(key).addNeighbor(edge);
+                }
             }
         }
 
-        Flooding flooding = new Flooding(first, message, client);
+        Flooding flooding = new Flooding(nodes.get(ownNode), message, client);
         flooding.visitedNodes();
     }
     

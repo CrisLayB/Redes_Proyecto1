@@ -7,6 +7,7 @@ public class Node {
     private String label;
     private String name;
     private boolean ready;
+    private boolean avaliable;
     private List<Edge> neighbors;
 
     public Node(String label){
@@ -23,6 +24,14 @@ public class Node {
         this.neighbors = new ArrayList<>();
     }
 
+    public Node(String label, String name, boolean avaliable) {
+        this.label = label;
+        this.name = name;
+        this.ready = true;
+        this.avaliable = avaliable;
+        this.neighbors = new ArrayList<>();
+    }
+
     public String getLabel() {
         return label;
     }
@@ -33,6 +42,10 @@ public class Node {
 
     public boolean getReady(){
         return ready;
+    }
+
+    public boolean getAvaliable(){
+        return avaliable;
     }
 
     public List<Edge> getNeighbors() {

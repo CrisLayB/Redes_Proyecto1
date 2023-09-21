@@ -273,6 +273,7 @@ public class XmppClient {
     public void addContactToList(String contact) throws Exception{
         EntityBareJid jid = JidCreate.entityBareFrom(contact);
         roster.createEntry(jid, null, null);
+        entityUserJid = jid;
     }
 
     /**
@@ -354,7 +355,17 @@ public class XmppClient {
         }
         
         chatOneToOne.send(message);
-    }   
+    }
+
+    /**
+     * Get status of the actual user
+     * 
+     * @return
+     */
+    public String checkStatus(){        
+        Type presence = roster.getPresence(entityUserJid).getType();
+        return presence.toString();
+    }
 
     /**
      * Recibe all the messagues for the group.
